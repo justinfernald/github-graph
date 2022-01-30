@@ -1,0 +1,12 @@
+{
+    "type": "module",
+    "scripts": {
+        "start": "node main.js",
+        "compress": "node --experimental-json-modules compress.js",
+        "compress-edge": "node --experimental-json-modules compress_edge.js"
+    },
+    "dependencies": {
+        "dotenv": "^14.3.2",
+        "octokit": "^1.7.1"
+    }
+}

@@ -1,0 +1,6 @@
+node_modules/
+.env
+graph.json
+graph_full.json
+graph copy.json
+graph copy 2.json
