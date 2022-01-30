@@ -2,6 +2,7 @@ import fs from "fs";
 import graph from "./graph.json";
 
 let output = "";
+let output_lang = "";
 
 for (const node of Object.values(graph).sort((a, b) => a.layer - b.layer)) {
     // if (node.layer > 2) continue
@@ -77,12 +78,14 @@ for (const node of Object.values(graph).sort((a, b) => a.layer - b.layer)) {
         combineCount[key] = (1 / (fixDistribution[key] || defaultValue)) * ((userLanguagesCount[key] || 0) + (starLanguagesCount[key] || 0));
     }
 
-    const chosenLanguage = Object.keys(combineCount).sort((a, b) => combineCount[b] - combineCount[a])[0] || "";
-
+    let chosenLanguage = Object.keys(combineCount).sort((a, b) => combineCount[b] - combineCount[a])[0] || "none";
+    chosenLanguage = chosenLanguage.split("#").join("Sharp")
+    output_lang += node.username + "\t" + chosenLanguage + "\t" + node.layer + "\n";
     console.log({ username: node.username, chosenLanguage })
     for (const followingPerson of node.following) {
-        output += node.username + " " + followingPerson + " " + node.layer + " " + "\n";
+        output += node.username + "\t" + followingPerson + "\t" + chosenLanguage + "\t" + node.layer + "\n";
     }
 }
 
+fs.writeFileSync("compressed_lang.data", output_lang);
 fs.writeFileSync("compressed_edge.data", output);
