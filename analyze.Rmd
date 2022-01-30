@@ -81,6 +81,7 @@ data_attr = as.numeric(unlist(vertex_attr(lang_graph_data), FALSE))
 
 
 plot(lang_graph_data, layout=layout.bipartite)
-# head(lang_data, 100)
 
+# count occurrences of languages
+table(entire_lang_data$V2)
 ```
