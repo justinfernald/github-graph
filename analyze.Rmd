@@ -34,15 +34,15 @@ members <- membership(wc)
 graph_d3 <- igraph_to_networkD3(graph_data, group = members)
 graph_d3$links$value = 1
 depth_data = aggregate(data$V4, by=list(data$V1), FUN=function(x) x[1])
-graph_d3$nodes$depth = 100
-graph_d3$nodes[graph_d3$nodes$name %in% depth_data$Group.1,]$depth = (5 - as.numeric(depth_data[match(depth_data$Group.1, graph_d3$nodes$name),]$x)) * 100
+graph_d3$nodes$depth = 10
+graph_d3$nodes[match(depth_data$Group.1, graph_d3$nodes$name),]$depth = (5 - as.numeric(depth_data$x)) ^ 2 * 50
 
 
 
 p = forceNetwork(
              Links = graph_d3$links,
              Nodes = graph_d3$nodes, 
-             charge = -100,
+             charge = -150,
              Source = 'source',
              Target = 'target', 
              NodeID = 'name',
@@ -54,9 +54,6 @@ p = forceNetwork(
              arrows = T
              )
 p
-```
-``` {r}
-graph_d3$nodes
 ```
 
 
@@ -81,7 +78,7 @@ data_attr = as.numeric(unlist(vertex_attr(lang_graph_data), FALSE))
 topValue = max(lang_data$V3)
 # more red less confidence
 E(lang_graph_data)$color <- rgb(topValue - lang_data$V3, 0, 0, maxColorValue = topValue);
-tkplot(lang_graph_data)
+# tkplot(lang_graph_data)
 
 la = layout.bipartite
 plot(lang_graph_data, layout=la)
@@ -104,7 +101,7 @@ topValue = max(lang_data_fix$V3)
 
 # more red less confidence
 E(lang_graph_fix_data)$color <- rgb(topValue - lang_data_fix$V3, 0, 0, maxColorValue = topValue);
-tkplot(lang_graph_fix_data)
+# tkplot(lang_graph_fix_data)
 
 la = layout.bipartite
 plot(lang_graph_fix_data, layout=la)
