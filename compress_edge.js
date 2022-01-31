@@ -3,9 +3,15 @@ import graph from "./graph.json";
 
 let output = "";
 let output_lang = "";
+let output_lang_fix = "";
 
 for (const node of Object.values(graph).sort((a, b) => a.layer - b.layer)) {
     // if (node.layer > 2) continue
+    const numberOfPublicRepos = node.userData.public_repos
+    const numberOfFollowers = node.userData.followers
+    const numberOfFollowing = node.userData.following
+    const numberOfStars = node.starredRepos.length
+
     const userLanguages = node.userRepos.map(x => x.language).filter(x => x)
     const starLanguages = node.starredRepos.map(x => x.language).filter(x => x)
 
@@ -74,18 +80,24 @@ for (const node of Object.values(graph).sort((a, b) => a.layer - b.layer)) {
     const defaultValue = 1;
 
     const combineCount = {};
+    const fixedCount = JSON.parse(JSON.stringify(combineCount));
     for (const key of new Set([...Object.keys(userLanguagesCount), ...Object.keys(starLanguagesCount)])) {
-        combineCount[key] = (1 / (fixDistribution[key] || defaultValue)) * ((userLanguagesCount[key] || 0) + (starLanguagesCount[key] || 0));
+        combineCount[key] = (userLanguagesCount[key] || 0) + (starLanguagesCount[key] || 0);
+        fixedCount[key] = (1 / (fixDistribution[key] || defaultValue)) * ((userLanguagesCount[key] || 0) + (starLanguagesCount[key] || 0));
     }
 
-    let chosenLanguage = Object.keys(combineCount).sort((a, b) => combineCount[b] - combineCount[a])[0] || "none";
-    chosenLanguage = chosenLanguage.split("#").join("Sharp")
-    output_lang += node.username + "\t" + chosenLanguage + "\t" + node.layer + "\n";
-    console.log({ username: node.username, chosenLanguage })
+    let topLanguage = Object.keys(combineCount).sort((a, b) => combineCount[b] - combineCount[a])[0] || "none";
+    let fixedLanguage = Object.keys(fixedCount).sort((a, b) => fixedCount[b] - fixedCount[a])[0] || "none";
+    topLanguage = topLanguage.split("#").join("Sharp")
+    fixedLanguage = fixedLanguage.split("#").join("Sharp")
+    output_lang += node.username + "\t" + topLanguage + "\t" + 100 * (combineCount[topLanguage] || 0 + .4 * Math.sqrt(numberOfFollowers) + .1 * numberOfFollowing) + "\t" + node.layer + "\n";
+    output_lang_fix += node.username + "\t" + fixedLanguage + "\t" + 100 * (fixedCount[fixedLanguage] || 0 + .4 * Math.sqrt(numberOfFollowers) + .1 * numberOfFollowing + .4 * numberOfPublicRepos + .2 * numberOfStars) + "\t" + node.layer + "\n";
+    console.log({ username: node.username, topLanguage, fixedLanguage })
     for (const followingPerson of node.following) {
-        output += node.username + "\t" + followingPerson + "\t" + chosenLanguage + "\t" + node.layer + "\n";
+        output += node.username + "\t" + followingPerson + "\t" + topLanguage + "\t" + node.layer + "\n";
     }
 }
 
 fs.writeFileSync("compressed_lang.data", output_lang);
+fs.writeFileSync("compressed_lang_fix.data", output_lang_fix);
 fs.writeFileSync("compressed_edge.data", output);

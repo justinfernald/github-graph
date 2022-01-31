@@ -68,20 +68,47 @@ g = small_graph_data
 plot(g)
 ```
 
-``` {r bipart}
+``` {r bipart_1}
 library(tidyr)
 
 entire_lang_data       <- read.table("compressed_lang.data", sep = "\t", header = FALSE)
 lang_data              <- entire_lang_data[c(1:12),]
-lang_graph_data        <- graph.data.frame(lang_data)
+lang_graph_data        <- graph.data.frame(lang_data, directed = F)
 
 V(lang_graph_data)$type <- bipartite_mapping(lang_graph_data)$type
 
 data_attr = as.numeric(unlist(vertex_attr(lang_graph_data), FALSE))
+topValue = max(lang_data$V3)
+# more red less confidence
+E(lang_graph_data)$color <- rgb(topValue - lang_data$V3, 0, 0, maxColorValue = topValue);
+tkplot(lang_graph_data)
 
-
-plot(lang_graph_data, layout=layout.bipartite)
+la = layout.bipartite
+plot(lang_graph_data, layout=la)
 
 # count occurrences of languages
 table(entire_lang_data$V2)
+```
+
+``` {r bipart_2}
+library(tidyr)
+
+entire_lang_fix_data       <- read.table("compressed_lang_fix.data", sep = "\t", header = FALSE)
+lang_data_fix              <- entire_lang_fix_data[c(1:12),]
+lang_graph_fix_data        <- graph.data.frame(lang_data_fix, directed = F)
+
+V(lang_graph_fix_data)$type <- bipartite_mapping(lang_graph_fix_data)$type
+
+data_attr = as.numeric(unlist(vertex_attr(lang_graph_fix_data), FALSE))
+topValue = max(lang_data_fix$V3)
+
+# more red less confidence
+E(lang_graph_fix_data)$color <- rgb(topValue - lang_data_fix$V3, 0, 0, maxColorValue = topValue);
+tkplot(lang_graph_fix_data)
+
+la = layout.bipartite
+plot(lang_graph_fix_data, layout=la)
+
+# count occurrences of languages
+table(entire_lang_fix_data$V2)
 ```
